@@ -4,7 +4,7 @@ import {View, Text} from 'react-native';
 export default function () {
   return (
     <View>
-      <Text>Albums screen</Text>
+      <Text>Other screen</Text>
     </View>
   );
 }
