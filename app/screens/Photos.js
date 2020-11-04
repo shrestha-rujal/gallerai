@@ -8,6 +8,7 @@ import {
   Platform,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -16,7 +17,7 @@ import theme from '../assets/theme';
 
 const {width, height} = Dimensions.get('window');
 
-export default function () {
+export default function ({navigation}) {
   const [photos, setPhotos] = useState([]);
 
   useEffect(() => {
@@ -48,6 +49,10 @@ export default function () {
     })();
   }, []);
 
+  const onPhotoClick = (item) => {
+    navigation.navigate('PhotoView', {image: item.node.image});
+  };
+
   return (
     <View>
       <FlatList
@@ -57,10 +62,14 @@ export default function () {
         keyExtractor={(item) => item.node.image.uri}
         renderItem={({item}) => {
           return (
-            <Image
-              style={style.defaultBox}
-              source={{uri: item.node.image.uri}}
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => onPhotoClick(item)}>
+              <Image
+                style={style.defaultBox}
+                source={{uri: item.node.image.uri}}
+              />
+            </TouchableOpacity>
           );
         }}
       />

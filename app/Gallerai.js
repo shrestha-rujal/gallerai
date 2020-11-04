@@ -2,21 +2,26 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
 import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import Animated from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Photos from './screens/Photos';
+import PhotoView from './screens/PhotoView';
 import Albums from './screens/Albums';
 import Cloud from './screens/Cloud';
 
 import stl from './assets/styles/style';
 import theme from './assets/theme';
 
+const Tab = createMaterialTopTabNavigator();
+const Stack = createStackNavigator();
+
 const TabBar = ({state, descriptors, navigation, position}) => {
   const ALBUM_INDEX = 1;
   const iconMapper = {
-    Photos: 'photo',
+    'All Photos': 'photo',
     Albums: 'photo-library',
     Cloud: 'cloud-download',
   };
@@ -57,13 +62,6 @@ const TabBar = ({state, descriptors, navigation, position}) => {
             }
           };
 
-          const onLongPress = () => {
-            navigation.emit({
-              type: 'tabLongPress',
-              target: route.key,
-            });
-          };
-
           const inputRange = state.routes.map((_, i) => i);
           const opacity = Animated.interpolateNode(position, {
             inputRange,
@@ -75,7 +73,6 @@ const TabBar = ({state, descriptors, navigation, position}) => {
               key={index}
               testID={options.tabBarTestID}
               onPress={onPress}
-              onLongPress={onLongPress}
               style={[stl.alignCenter]}>
               <Animated.View>
                 <Icon name={label} color={activeColor} size={28} />
@@ -89,16 +86,21 @@ const TabBar = ({state, descriptors, navigation, position}) => {
   );
 };
 
-export default function () {
-  const Tab = createMaterialTopTabNavigator();
+const photoNavigation = () => (
+  <Stack.Navigator initialRouteName="Photos" headerMode="none">
+    <Stack.Screen name="Photos" component={Photos} />
+    <Stack.Screen name="PhotoView" component={PhotoView} />
+  </Stack.Navigator>
+);
 
+export default function () {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="Photos"
+        initialRouteName="All Photos"
         lazy
         tabBar={(props) => <TabBar {...props} />}>
-        <Tab.Screen name="Photos" component={Photos} />
+        <Tab.Screen name="All Photos" component={photoNavigation} />
         <Tab.Screen name="Albums" component={Albums} />
         <Tab.Screen name="Cloud" component={Cloud} />
       </Tab.Navigator>
