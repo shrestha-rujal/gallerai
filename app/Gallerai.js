@@ -14,6 +14,7 @@ import stl from './assets/styles/style';
 import theme from './assets/theme';
 
 const TabBar = ({state, descriptors, navigation, position}) => {
+  const ALBUM_INDEX = 1;
   const iconMapper = {
     Photos: 'photo',
     Albums: 'photo-library',
@@ -24,7 +25,17 @@ const TabBar = ({state, descriptors, navigation, position}) => {
     <View style={style.header}>
       <View style={[stl.row, stl.justifyBetween, style.headerTextContent]}>
         <Text style={style.headerText}>{state.routeNames[state.index]}</Text>
-        <Icon name="more-vert" color="black" size={theme.sizes.base * 2} />
+        <View style={[stl.row, stl.alignCenter]}>
+          {state.index === ALBUM_INDEX && (
+            <Icon
+              name="add"
+              color="black"
+              size={theme.sizes.base * 2}
+              style={style.addIcon}
+            />
+          )}
+          <Icon name="more-vert" color="black" size={theme.sizes.base * 2} />
+        </View>
       </View>
       <View style={[stl.row, stl.alignCenter, style.barIcons]}>
         {state.routes.map((route, index) => {
@@ -111,7 +122,7 @@ const style = StyleSheet.create({
   barIcons: {
     paddingHorizontal: theme.sizes.padding * 5,
     justifyContent: 'space-around',
-    marginBottom: theme.sizes.margin,
+    marginBottom: theme.sizes.margin * 0.7,
   },
   iconUnderline: {
     marginTop: theme.sizes.margin * 0.3,
@@ -119,5 +130,8 @@ const style = StyleSheet.create({
     height: theme.sizes.base * 0.25,
     borderRadius: theme.sizes.base,
     backgroundColor: theme.colors.blue,
+  },
+  addIcon: {
+    marginRight: theme.sizes.margin * 2,
   },
 });
