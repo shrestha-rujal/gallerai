@@ -7,13 +7,9 @@ import {
   PermissionsAndroid,
   Platform,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-
-import stl from '../assets/styles/style';
-import theme from '../assets/theme';
 
 const {width, height} = Dimensions.get('window');
 
