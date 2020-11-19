@@ -15,10 +15,10 @@ import theme from '../assets/theme';
 import TextInput from './components/TextInput';
 
 export default function ({navigation}) {
-  const [username, setUsername] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [passwordConfirm, setPasswordConfirm] = React.useState('');
+  const [name, setName] = React.useState('user11');
+  const [email, setEmail] = React.useState('user11@gallerai.io');
+  const [password, setPassword] = React.useState('test1234');
+  const [passwordConfirm, setPasswordConfirm] = React.useState('test1234');
 
   const {signup} = React.useContext(AuthContext);
 
@@ -37,8 +37,8 @@ export default function ({navigation}) {
       <View style={style.inputArea}>
         <TextInput
           placeholder="USERNAME"
-          value={username}
-          onChangeText={setUsername}
+          value={name}
+          onChangeText={setName}
           inputLeftIcon="account-circle"
         />
         <TextInput
@@ -64,7 +64,7 @@ export default function ({navigation}) {
         <TouchableOpacity
           activeOpacity={0.85}
           style={style.submitBtn}
-          onPress={() => signup(username, email, password, passwordConfirm)}>
+          onPress={() => signup(name, email, password, passwordConfirm)}>
           <Text style={style.submitText}>Sign up</Text>
         </TouchableOpacity>
         <View style={style.navLink}>
@@ -108,7 +108,7 @@ const style = StyleSheet.create({
     color: theme.colors.dimWhite,
   },
   submitBtn: {
-    marginTop: theme.sizes.margin * 3,
+    marginTop: theme.sizes.margin * 4,
     paddingVertical: theme.sizes.padding * 1.3,
     width: '100%',
     alignItems: 'center',

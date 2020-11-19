@@ -36,7 +36,7 @@ const reducer = (prevState, action) => {
       return {
         ...prevState,
         userToken: action.userToken,
-        isLoading: true,
+        isLoggedIn: true,
       };
     case ACTIONS.LOG_OUT:
       return {
@@ -81,9 +81,13 @@ export default function () {
       login: async (email, password) => {
         try {
           const res = await API.login(email, password);
-          res.token = 'temporary_token';
-          await AsyncStorage.setItem('@user_token', res.token);
-          dispatch({type: ACTIONS.LOG_IN, token: res.token});
+          if (res.status === 'success') {
+            res.token = 'temporary_token';
+            await AsyncStorage.setItem('@user_token', res.token);
+            dispatch({type: ACTIONS.LOG_IN, token: res.token});
+          } else {
+            throw new Error(res.message);
+          }
         } catch (err) {
           console.log('ERROR LOGGING IN: ', err);
         }
@@ -92,13 +96,19 @@ export default function () {
         await AsyncStorage.removeItem('@user_token');
         dispatch({type: ACTIONS.LOG_OUT});
       },
-      signup: async (username, email, password, passwordConfirm) => {
-        const res = await API.signup(
-          username,
-          email,
-          password,
-          passwordConfirm,
-        );
+      signup: async (name, email, password, passwordConfirm) => {
+        try {
+          const res = await API.signup(name, email, password, passwordConfirm);
+          if (res.status === 'success') {
+            res.token = 'temporary_token';
+            await AsyncStorage.setItem('@user_token', res.token);
+            dispatch({type: ACTIONS.LOG_IN, userToken: res.token});
+          } else {
+            throw new Error(res.message);
+          }
+        } catch (err) {
+          console.log('ERROR REGISTERTING ACCOUNT: ', err);
+        }
       },
       userToken: state.userToken,
     }),
@@ -109,7 +119,7 @@ export default function () {
     <NavigationContainer>
       <AuthContext.Provider value={authContext}>
         {!state.isLoggedIn ? (
-          <Stack.Navigator headerMode="none">
+          <Stack.Navigator headerMode="none" initialRouteName="Login">
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
           </Stack.Navigator>

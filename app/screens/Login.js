@@ -15,8 +15,8 @@ import theme from '../assets/theme';
 import TextInput from './components/TextInput';
 
 export default function ({navigation}) {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [email, setEmail] = React.useState('admin@gallerai.io');
+  const [password, setPassword] = React.useState('test1234');
   const {login} = React.useContext(AuthContext);
 
   return (

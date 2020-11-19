@@ -3,6 +3,7 @@ import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Animated from 'react-native-reanimated';
 
+import AuthContext from '../../../utils/AuthContext';
 import theme from '../../assets/theme';
 import stl from '../../assets/styles/style';
 
@@ -13,6 +14,7 @@ const TabBar = ({state, descriptors, navigation, position}) => {
     Albums: 'photo-library',
     Cloud: 'cloud-download',
   };
+  const {logout} = React.useContext(AuthContext);
 
   return (
     <View style={style.header}>
@@ -27,7 +29,9 @@ const TabBar = ({state, descriptors, navigation, position}) => {
               style={style.addIcon}
             />
           )}
-          <Icon name="more-vert" color="black" size={theme.sizes.base * 2} />
+          <TouchableOpacity activeOpacity={0.85} onPress={() => logout()}>
+            <Icon name="logout" color="black" size={theme.sizes.base * 2} />
+          </TouchableOpacity>
         </View>
       </View>
       <View style={[stl.row, stl.alignCenter, style.barIcons]}>

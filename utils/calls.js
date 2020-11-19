@@ -1,6 +1,6 @@
 import consts from '../consts';
 
-const call = async ({path, body, method = 'GET', token, headers={}}) => {
+const call = async ({path, body, method = 'GET', token, headers = {}}) => {
   const res = await fetch(`${consts.HOST_URL}${path}`, {
     method,
     headers: {
@@ -17,10 +17,9 @@ const call = async ({path, body, method = 'GET', token, headers={}}) => {
 export const login = (email, password) =>
   call({path: '/users/login', body: {email, password}, method: 'POST'});
 
-export const signup = (username, email, password, passwordConfirm) => {
+export const signup = (name, email, password, passwordConfirm) =>
   call({
     path: '/users/signup',
-    body: {username, email, password, passwordConfirm},
+    body: {name, email, password, passwordConfirm},
     method: 'POST',
   });
-};
