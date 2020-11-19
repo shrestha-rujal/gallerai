@@ -9,6 +9,9 @@ export default {
     border: 0.4,
   },
   colors: {
+    greenBg: '#364f4d',
+    golden: '#ffcea2',
+    darkBlue: '#1e3b5c',
     blue: '#386df1',
     gray: '#7f7f7f',
     secondary: '#7cb2cc',
@@ -19,5 +22,7 @@ export default {
     caption: '#bdbdbd',
     green: '#27ae60',
     lightGray: 'rgba(0,0,0,0.1)',
+    dimWhite: '#a2bfbd',
+    dimmerWhite: '#9db0af',
   },
 };
