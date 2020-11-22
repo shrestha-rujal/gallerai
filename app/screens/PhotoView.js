@@ -6,7 +6,6 @@ import theme from '../assets/theme';
 
 export default function (props) {
   const {image} = props.route.params;
-  console.log('IMAGE: ', image);
   return (
     <Image
       resizeMode="contain"

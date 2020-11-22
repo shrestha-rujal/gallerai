@@ -82,7 +82,6 @@ export default function () {
         try {
           const res = await API.login(email, password);
           if (res.status === 'success') {
-            res.token = 'temporary_token';
             await AsyncStorage.setItem('@user_token', res.token);
             dispatch({type: ACTIONS.LOG_IN, token: res.token});
           } else {
@@ -100,7 +99,6 @@ export default function () {
         try {
           const res = await API.signup(name, email, password, passwordConfirm);
           if (res.status === 'success') {
-            res.token = 'temporary_token';
             await AsyncStorage.setItem('@user_token', res.token);
             dispatch({type: ACTIONS.LOG_IN, userToken: res.token});
           } else {
