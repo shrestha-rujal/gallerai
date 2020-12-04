@@ -1,5 +1,6 @@
 import React from 'react';
 import CameraRoll from '@react-native-community/cameraroll';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Dimensions,
   FlatList,
@@ -13,7 +14,7 @@ import {
 import stl from '../assets/styles/style';
 import theme from '../assets/theme';
 
-import {uploadImage} from '../../utils/calls';
+import {uploadImage, searchSimilarImages} from '../../utils/calls';
 
 const {width} = Dimensions.get('window');
 
@@ -34,7 +35,7 @@ export default function ({navigation}) {
       </View>
       <View style={style.imageContainer}>
         {group.map((img, key) => {
-          const uri = `file:///storage/emulated/0/DCIM/Camera/${img}`;
+          const uri = `https://galleraiphotos.s3.amazonaws.com/${img}`;
           return (
             <TouchableOpacity
               activeOpacity={0.8}
@@ -63,6 +64,7 @@ export default function ({navigation}) {
 
   const uploadLocalImages = async () => {
     try {
+      const userToken = await AsyncStorage.getItem('@user_token');
       const cameralRollRes = await CameraRoll.getPhotos({
         first: 9999,
         assetType: 'Photos',
@@ -70,27 +72,32 @@ export default function ({navigation}) {
 
       const images = cameralRollRes.edges.map((item) => item.node.image);
 
-      const formData = new FormData();
-      images.slice(0, 16).forEach((image) => {
+      const uploadPromises = images.slice(0, 5).map((image) => {
+        const formData = new FormData();
         const filename = image.uri.split('/').pop();
         formData.append('image', {
           uri: image.uri,
           type: 'image/jpeg',
           name: filename,
         });
+        return uploadImage(formData, userToken);
       });
 
-      const res = await uploadImage(formData);
-      setShowFindBtn(false);
-      return res.data;
+      const res = await Promise.all(uploadPromises);
     } catch (err) {
       console.log('ERROR UPLOADING IMAGES: ', err);
     }
   };
 
-  const findSimilar = async () => {
-    const result = await uploadLocalImages();
-    setGroups(result);
+  const getSimilarImages = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem('@user_token');
+      const result = await searchSimilarImages(userToken);
+      setShowFindBtn(false);
+      setGroups(result.data);
+    } catch (err) {
+      console.log('ERROR GETTING SIMILAR IMAGES: ', err);
+    }
   };
 
   return (
@@ -104,9 +111,17 @@ export default function ({navigation}) {
           <TouchableOpacity
             style={stl.button}
             activeOpacity={0.9}
-            onPress={() => findSimilar()}>
+            onPress={() => uploadLocalImages()}>
             <Text style={style.btnText}>
-              {isLoading ? 'Processing...' : 'Click to find similar images'}
+              {isLoading ? 'Processing...' : 'Upload Local Images'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[stl.button, style.lowerBtn]}
+            activeOpacity={0.9}
+            onPress={() => getSimilarImages()}>
+            <Text style={style.btnText}>
+              {isLoading ? 'Processing...' : 'Find Similar Images'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -157,5 +172,8 @@ const style = StyleSheet.create({
     height: 98,
     margin: 1.8,
     borderRadius: 3,
+  },
+  lowerBtn: {
+    marginTop: theme.sizes.margin * 1.6,
   },
 });

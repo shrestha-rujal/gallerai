@@ -1,16 +1,20 @@
 import consts from '../consts';
 
 const call = async ({path, body, method = 'GET', token, headers = {}}) => {
-  const res = await fetch(`${consts.HOST_URL}${path}`, {
-    method,
-    headers: {
-      ...headers,
-      Authorization: token ? `Bearer ${token}` : undefined,
-    },
-    body,
-  });
+  try {
+    const res = await fetch(`${consts.HOST_URL}${path}`, {
+      method,
+      headers: {
+        ...headers,
+        Authorization: token ? `Bearer ${token}` : undefined,
+      },
+      body,
+    });
 
-  return await res.json();
+    return await res.json();
+  } catch (err) {
+    console.log('NETWORK CALL ERROR: ', err);
+  }
 };
 
 export const login = (email, password) =>
@@ -33,10 +37,15 @@ export const signup = (name, email, password, passwordConfirm) =>
     },
   });
 
-export const uploadImage = (payload) => {
+export const uploadImage = (payload, token) => {
   return call({
-    path: '/images/upload',
+    path: '/images',
     body: payload,
     method: 'POST',
+    token,
   });
+};
+
+export const searchSimilarImages = (token) => {
+  return call({path: '/images/find-similar', token, method: 'GET'});
 };
