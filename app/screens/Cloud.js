@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import CameraRoll from '@react-native-community/cameraroll';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   Dimensions,
   FlatList,
@@ -14,17 +15,35 @@ import {
 import stl from '../assets/styles/style';
 import theme from '../assets/theme';
 
-import {uploadImage, searchSimilarImages} from '../../utils/calls';
+import {
+  uploadImage,
+  searchSimilarImages,
+  deleteImages,
+} from '../../utils/calls';
 
 const {width} = Dimensions.get('window');
 
 export default function ({navigation}) {
-  const [showFindBtn, setShowFindBtn] = React.useState(true);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [groups, setGroups] = React.useState([]);
+  const [showFindBtn, setShowFindBtn] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [groups, setGroups] = useState([]);
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [selectedPhotos, setSelectedPhotos] = useState([]);
+
+  useEffect(() => {
+    setDeleteMode(!!selectedPhotos.length);
+  }, [selectedPhotos]);
 
   const onPhotoClick = (uri) => {
     navigation.navigate('PhotoView', {image: {uri}});
+  };
+
+  const onPhotoLongPress = (img) => {
+    setSelectedPhotos(
+      selectedPhotos.includes(img)
+        ? [...selectedPhotos.filter((items) => items !== img)]
+        : [...selectedPhotos, img],
+    );
   };
 
   const renderImageGroup = (group, index) => (
@@ -35,13 +54,21 @@ export default function ({navigation}) {
       </View>
       <View style={style.imageContainer}>
         {group.map((img, key) => {
-          const uri = `https://galleraiphotos.s3.amazonaws.com/${img}`;
+          const uri = `file:///storage/emulated/0/DCIM/Camera/${img}`;
+          // const uri = `https://galleraiphotos.s3.amazonaws.com/${img}`;
           return (
             <TouchableOpacity
               activeOpacity={0.8}
               key={key}
+              onLongPress={() => onPhotoLongPress(img)}
               onPress={() => onPhotoClick(uri)}>
-              <Image style={style.defaultBox} source={{uri}} />
+              <Image
+                style={[
+                  style.defaultBox,
+                  selectedPhotos.includes(img) ? style.selected : null,
+                ]}
+                source={{uri}}
+              />
             </TouchableOpacity>
           );
         })}
@@ -72,7 +99,7 @@ export default function ({navigation}) {
 
       const images = cameralRollRes.edges.map((item) => item.node.image);
 
-      const uploadPromises = images.slice(0, 5).map((image) => {
+      const uploadPromises = images.slice(0, 16).map((image) => {
         const formData = new FormData();
         const filename = image.uri.split('/').pop();
         formData.append('image', {
@@ -93,11 +120,23 @@ export default function ({navigation}) {
     try {
       const userToken = await AsyncStorage.getItem('@user_token');
       const result = await searchSimilarImages(userToken);
-      setShowFindBtn(false);
-      setGroups(result.data);
+      if (result && result.data) {
+        setShowFindBtn(false);
+        setGroups(result.data);
+      }
     } catch (err) {
       console.log('ERROR GETTING SIMILAR IMAGES: ', err);
     }
+  };
+
+  const handleDelete = async () => {
+    const userToken = await AsyncStorage.getItem('@user_token');
+    await deleteImages(userToken, JSON.stringify({images: selectedPhotos}));
+    setSelectedPhotos([]);
+  };
+
+  const handleClear = () => {
+    setSelectedPhotos([]);
   };
 
   return (
@@ -126,7 +165,25 @@ export default function ({navigation}) {
           </TouchableOpacity>
         </View>
       ) : (
-        <View style={style.mainContainer}>{renderImageGroups()}</View>
+        <View style={stl.flex}>
+          <View style={style.mainContainer}>{renderImageGroups()}</View>
+          {deleteMode && (
+            <View style={style.sideBtnsContainer}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[style.sideBtn, style.deleteBtn]}
+                onPress={handleDelete}>
+                <Icon name="delete" color="white" size={30} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[style.sideBtn, style.cancelBtn]}
+                onPress={handleClear}>
+                <Icon name="clear" color="white" size={25} />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       )}
     </View>
   );
@@ -173,7 +230,37 @@ const style = StyleSheet.create({
     margin: 1.8,
     borderRadius: 3,
   },
+  selected: {
+    borderWidth: 6,
+    borderColor: theme.colors.lightBlue,
+    opacity: 0.6,
+  },
   lowerBtn: {
+    marginTop: theme.sizes.margin * 1.6,
+  },
+  sideBtnsContainer: {
+    position: 'absolute',
+    top: '40%',
+    right: theme.sizes.margin * 0.5,
+    backgroundColor: theme.colors.white,
+    paddingVertical: theme.sizes.padding * 0.5,
+    paddingHorizontal: theme.sizes.padding * 0.5,
+    borderRadius: 40,
+    elevation: 2,
+  },
+  sideBtn: {
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 50,
+    elevation: theme.sizes.elevation * 2,
+  },
+  deleteBtn: {
+    backgroundColor: 'red',
+  },
+  cancelBtn: {
+    backgroundColor: 'green',
     marginTop: theme.sizes.margin * 1.6,
   },
 });

@@ -11,7 +11,8 @@ const call = async ({path, body, method = 'GET', token, headers = {}}) => {
       body,
     });
 
-    return await res.json();
+    const resJson = await res.json();
+    return resJson;
   } catch (err) {
     console.log('NETWORK CALL ERROR: ', err);
   }
@@ -48,4 +49,16 @@ export const uploadImage = (payload, token) => {
 
 export const searchSimilarImages = (token) => {
   return call({path: '/images/find-similar', token, method: 'GET'});
+};
+
+export const deleteImages = (token, payload) => {
+  return call({
+    path: '/images',
+    body: payload,
+    token,
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
