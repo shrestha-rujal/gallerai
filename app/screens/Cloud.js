@@ -29,21 +29,25 @@ export default function ({navigation}) {
   const [groups, setGroups] = useState([]);
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState([]);
+  const [deletedPhotos, setDeletedPhotos] = useState([]);
 
   useEffect(() => {
     setDeleteMode(!!selectedPhotos.length);
   }, [selectedPhotos]);
 
   const onPhotoClick = (uri) => {
+    console.log('NAVIGATION uri: ', uri);
     navigation.navigate('PhotoView', {image: {uri}});
   };
 
   const onPhotoLongPress = (img) => {
-    setSelectedPhotos(
-      selectedPhotos.includes(img)
-        ? [...selectedPhotos.filter((items) => items !== img)]
-        : [...selectedPhotos, img],
-    );
+    if (!deletedPhotos.includes(img)) {
+      setSelectedPhotos(
+        selectedPhotos.includes(img)
+          ? [...selectedPhotos.filter((items) => items !== img)]
+          : [...selectedPhotos, img],
+      );
+    }
   };
 
   const renderImageGroup = (group, index) => (
@@ -66,6 +70,7 @@ export default function ({navigation}) {
                 style={[
                   style.defaultBox,
                   selectedPhotos.includes(img) ? style.selected : null,
+                  deletedPhotos.includes(img) ? style.deleted : null,
                 ]}
                 source={{uri}}
               />
@@ -132,6 +137,7 @@ export default function ({navigation}) {
   const handleDelete = async () => {
     const userToken = await AsyncStorage.getItem('@user_token');
     await deleteImages(userToken, JSON.stringify({images: selectedPhotos}));
+    setDeletedPhotos([...deletedPhotos, ...selectedPhotos]);
     setSelectedPhotos([]);
   };
 
@@ -233,6 +239,11 @@ const style = StyleSheet.create({
   selected: {
     borderWidth: 6,
     borderColor: theme.colors.lightBlue,
+    opacity: 0.6,
+  },
+  deleted: {
+    borderWidth: 6,
+    borderColor: 'red',
     opacity: 0.6,
   },
   lowerBtn: {
