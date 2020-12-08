@@ -33,4 +33,10 @@ export default StyleSheet.create({
   elevated: {
     elevation: theme.sizes.elevation,
   },
+  button: {
+    backgroundColor: theme.colors.golden,
+    paddingVertical: theme.sizes.padding * 1,
+    paddingHorizontal: theme.sizes.padding * 1.5,
+    borderRadius: theme.sizes.radius,
+  },
 });

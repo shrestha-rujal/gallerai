@@ -23,7 +23,7 @@ export default function ({navigation}) {
           const result = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
             {
-              title: 'Permission Explanation',
+              title: 'Storage Permission',
               message: 'Gallerai would like to access your photos!',
             },
           );
@@ -34,7 +34,7 @@ export default function ({navigation}) {
         }
 
         const res = await CameraRoll.getPhotos({
-          first: 50,
+          first: 9999,
           assetType: 'Photos',
         });
 

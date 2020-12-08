@@ -13,6 +13,7 @@ export default {
     golden: '#ffcea2',
     darkBlue: '#1e3b5c',
     blue: '#386df1',
+    lightBlue: '#00a8ff',
     gray: '#7f7f7f',
     secondary: '#7cb2cc',
     white: '#ffffff',
